@@ -156,6 +156,14 @@ var savePref = function(username, preferences, callback) {
   }).then(callback);
 };
 
+var getPref = function(username, callback) {
+  sequelize.models.users.preferences.findAll({
+    where: {
+      username: username
+    }
+  }).then(callback);
+};
+
 
 module.exports = {
   users: sequelize.models.users,
@@ -171,6 +179,7 @@ module.exports = {
   newUser: newUser,
   checkUser: checkUser,
   savePref: savePref,
+  getPref: getPref,
   findUserByUsername: findUserByUsername,
   newUser: newUser
 };

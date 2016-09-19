@@ -12,9 +12,9 @@ var blockchain = require('./utils/blockchain.js');
 var gdax = require('./utils/gdax.js');
 var bitstamp = require('./utils/bitstamp.js');
 var poloniex = require('./utils/poloniex.js');
-var btcc = require('./utils/btcc.js');
+// var btcc = require('./utils/btcc.js');
 var rocktrading = require('./utils/rocktrading.js');
-var gemini = require('./utils/gemini.js');
+// var gemini = require('./utils/gemini.js');
 var bitfinex = require('./utils/bitfinex.js');
 
 var rates = require('./workers/exchangeRates.js');
@@ -99,7 +99,6 @@ app.get('/users/preferences', restrict, function(req, res) {
 //update user's pref
 app.post('/users/preferences', restrict, function(req, res) {
   //Note: this is hacky... try to fix this next team!
-  // console.log('Saving prefs now: ', Object.keys(req.body)[0]);
   db.savePref(req.session.user, Object.keys(req.body)[0], function(data) {
     // console.log(data);
     res.status(200).send();

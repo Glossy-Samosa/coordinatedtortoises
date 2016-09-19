@@ -55,21 +55,30 @@ class TxMaker extends React.Component {
         data['amount'] = 0;
         shouldSend = false;
       } else {
-        data['amount'] = $('#amount').val();
+        // data['amount'] = $('#amount').val();
       }    
 
       //If it's ok to send the data, it sends it to the server and builds it and pushes it to the blockchain
       if(shouldSend){ 
-        // update state
-        props.updateHistory(data['amount']);
-        // update prefs
-        props.savePrefs();
+        // ==============
+        // ASYNC SOLUTION
+        // ==============
+
+        var asyncPrefUpdate = function(callback) {
+          // updates state
+          // first updates state
+          props.updateHistory(data['amount'] + ' BTC');
+          callback();          
+        };
+
+        asyncPrefUpdate(function() {
+          // then save state to user prefs in db:
+          props.savePrefs();          
+        });
+
         // confirm transaction amount
         $('#results').append('<span class="bg-success">' + data['amount'] + " BTC Sent" + '</span>');
-        
-        /*$.post('http://localhost:3000/txmake', data, function(tx){ 
-          $('#results').append('<span class="bg-success">' + tx + " BTC Sent" + '</span>');
-        });*/
+
       } else {
         $('#results').append('<span class="bg-danger">Please Fill out All Fields</span>');
       }
@@ -78,16 +87,26 @@ class TxMaker extends React.Component {
     $('.pastTx').on('click', function(){
       //Empties out previous results from the last transaction.
       $('#results').empty();
-      var transactions = props.history;
-      var shouldSend = transactions === 0 ? false : true;
       
-      if(shouldSend){ 
-        transactions.forEach(function(tx) {
-          $('#results').append('<br/><span class="bg-success">' + tx + '</span>');
+      var transactions = function(callback) {
+        var transHistory = props.getPrefs(function(data) {
+          // return data;
+          callback(JSON.parse(data));
         });
-      } else {
-        $('#results').append('<span class="bg-danger">You Have No Transaction History</span>');
-      }
+      };
+
+      transactions(function(data) {
+        var history = data.history;
+        console.log('&&&&&&&& transaction history &&&&&&&&&', history);
+        var shouldSend = history.length === 0 ? false : true;
+        if(shouldSend){ 
+          history.forEach(function(tx) {
+            $('#results').append('<br/><span class="bg-success">' + tx + '</span>');
+          });
+        } else {
+          $('#results').append('<span class="bg-danger">You Have No Transaction History</span>');
+        }
+      });
     });
   }
 

@@ -33,20 +33,16 @@ class App extends React.Component {
 
     //Set state must be async? When passing this.state instead of data it the old defaults
     this.getPrefs((data) => {
-      // console.log(JSON.parse(data));
-      // this.setState(JSON.parse(data));
-      // this.props.graph.init(JSON.parse(data));
+      this.setState(JSON.parse(data));  
+      console.log('############## UPDATED STATE ########### \n', this.state);
     });
   }
 
-  //Used to visually display a successful save
+  // Used to visually display a successful save
   synced() {
-    console.log(this);
     this.setState({
       synced: true
     });
-
-    console.log(setTimeout);
 
     setTimeout(function() {
       console.log(this.state);
@@ -63,7 +59,8 @@ class App extends React.Component {
     var context = this;
 
     $.ajax({
-      url: 'http://localhost:3000/users/preferences',
+      // TODO: Test url in Deployment Environment
+      url: 'http://localhost:3000/users/preferences', 
       method: 'POST',
       data: JSON.stringify(this.state),
       success: (data) => {
@@ -75,13 +72,12 @@ class App extends React.Component {
   }
 
 
-  //Gets the preferences from the user
+  // TODO: test this helper
   getPrefs(callback) {
     console.log('Getting prefs now', this.state);
 
-    var context = this;
-
     $.ajax({
+      // TODO: Test url in Deployment Environment
       url: 'http://localhost:3000/users/preferences',
       method: 'GET',
       success: (data) => callback(JSON.parse(data)),
@@ -136,11 +132,14 @@ class App extends React.Component {
   //Handles transaction history update
   updateHistory(tx) {
     var newHistory = this.state.history;
+    console.log("************initial history**********", this.state.history);
     newHistory.push(tx);
 
     this.setState({
       history: newHistory
     });
+    console.log("************new history**********", newHistory);
+
   }
 
   logout() {
@@ -154,18 +153,6 @@ class App extends React.Component {
     return (
       <div className="target">
         <NavBar logout={this.logout} savePrefs={this.savePrefs.bind(this)} synced={this.synced.bind(this)} syncState={this.state.synced} />
-        
-        <div className="col-md-4">
-          <div className="panel panel-primary height-full">
-            <div className="panel-heading"> Cryptocurrency Dashboard</div>
-            <div className="panel-body">
-              <TxMaker history={this.state.history} updateHistory={this.updateHistory.bind(this)} savePrefs={this.savePrefs.bind(this)}/>
-            </div>
-            <div className="panel-footer">
-              Made with <img src="./assets/heart.png" height="5" width="5"/> at Hack Reactor.
-            </div>
-          </div>    
-        </div>
 
         <div className="col-md-8">    
           <WorldMap />
@@ -174,11 +161,21 @@ class App extends React.Component {
           <Transactions />
           <Exchanges currencies={this.props.currencies} currHandler={this.currencyHandler.bind(this)} currencyState={this.state.currency.text}/>
         </div>
+        
+        <div className="col-md-4">
+          <div className="panel panel-primary height-full">
+            <div className="panel-heading"> Cryptocurrency Dashboard</div>
+            <div className="panel-body">
+              <TxMaker savePrefs={this.savePrefs.bind(this)} getPrefs={this.getPrefs.bind(this)} history={this.state.history} updateHistory={this.updateHistory.bind(this)} />
+            </div>
+            <div className="panel-footer">
+              Made with <img src="./assets/heart.png" height="5" width="5"/> at Hack Reactor.
+            </div>
+          </div>    
+        </div>
       </div>
     );
   }
-
-
 }
 
 
